@@ -35,3 +35,7 @@ flowchart LR
 
 ```
 
+<div style="background-color: #fffbeb; border: 1px solid #fbbf24; border-radius: 6px; padding: 16px; margin: 20px 0;">
+<strong>Note:</strong> Over the past decade, user consumption patterns have fundamentally shifted from direct channels (where publishers maintain full control and revenue potential) to indirect channels (where third parties control the relationship and capture most of the value). This migration from direct to indirect consumption has created the revenue gap that threatens content sustainability.
+</div>
+

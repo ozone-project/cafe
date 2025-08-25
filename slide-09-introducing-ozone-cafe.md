@@ -1,4 +1,4 @@
-[Home](slide-01-title.md) | [Prev](slide-08-content-creator-ui.md) | [Next](slide-10-data-collector-ui.md) | [End](slide-16-appendix-research.md)
+[Home](slide-01-title.md) | [Prev](slide-08-components-needed-for-content-access.md) | [Next](slide-10-data-collector-ui.md) | [End](slide-16-appendix-research.md)
 
 # Slide 9: Introducing OZONE.CAFE
 

@@ -66,8 +66,37 @@ Navigate the presentation slides here: **[Start Presentation →](slide-01-title
 - **Business Models** - Revenue and pricing strategies
 - **Appendix & Research** - Supporting documentation and sources
 
+## 🚀 CAFE Prototype
+
+In addition to the presentation slides, this repository includes a working prototype of the CAFE platform:
+
+**[📂 cafe-prototype/](cafe-prototype/)** - Full-stack publisher dashboard prototype
+
+### Quick Start
+```bash
+cd cafe-prototype
+npm install
+docker-compose up -d  # Start database
+npm run dev           # Start both frontend & backend
+```
+
+Visit http://localhost:5173 to see the CAFE publisher dashboard in action.
+
+**Features:**
+- 📊 **Publisher Dashboard** with real-time metrics visualization
+- 📈 **Channel Management** for direct and indirect content distribution  
+- 💰 **Revenue Tracking** across all channels
+- 🤖 **Human vs Bot Analytics** 
+- ⚖️ **License Management** system
+
+**Tech Stack:** React + TypeScript + Node.js + PostgreSQL + Prisma
+
+[→ View Prototype Documentation](cafe-prototype/README.md)
+
+---
+
 ## Tools Used
 
 - Mermaid diagrams for technical illustrations
-- Markdown for slide content
-- Markdown for research information
+- Markdown for slide content  
+- React + TypeScript for prototype implementation

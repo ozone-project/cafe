@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Publisher {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  website     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  channels    Channel[]
+  licenses    License[]
+
+  @@map("publishers")
+}
+
+enum ChannelType {
+  DIRECT_APP
+  DIRECT_WEB
+  DIRECT_NEWSLETTER
+  DIRECT_PODCAST
+  INDIRECT_SEARCH
+  INDIRECT_SOCIAL
+  INDIRECT_AI
+  INDIRECT_NEWS_AGGREGATOR
+}
+
+model Channel {
+  id          String      @id @default(cuid())
+  name        String
+  type        ChannelType
+  description String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  publisherId String
+  publisher   Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+
+  metrics     ChannelMetric[]
+  licenses    License[]
+
+  @@map("channels")
+}
+
+model ChannelMetric {
+  id          String   @id @default(cuid())
+  date        DateTime
+  users       Int      @default(0)
+  humanUsers  Int      @default(0)
+  botUsers    Int      @default(0)
+  revenue     Decimal  @default(0) @db.Decimal(10, 2)
+  referrals   Int      @default(0)
+  pageViews   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  channelId   String
+  channel     Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, date])
+  @@map("channel_metrics")
+}
+
+enum LicenseType {
+  BASIC
+  PREMIUM
+  ENTERPRISE
+  CUSTOM
+}
+
+model License {
+  id              String      @id @default(cuid())
+  name            String
+  type            LicenseType
+  description     String?
+  pricePerMonth   Decimal?    @db.Decimal(10, 2)
+  pricePerRequest Decimal?    @db.Decimal(6, 4)
+  maxRequests     Int?
+  allowBot        Boolean     @default(false)
+  allowAPI        Boolean     @default(true)
+  allowRealtime   Boolean     @default(false)
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  publisherId     String
+  publisher       Publisher @relation(fields: [publisherId], references: [id], onDelete: Cascade)
+
+  channels        Channel[]
+
+  @@map("licenses")
+}

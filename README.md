@@ -21,36 +21,34 @@ A complete solution for fair content licensing and distribution, including both 
 
 ## 📊 Presentation Slides
 
-This repository contains a comprehensive slide deck explaining the CAFE concept, market opportunity, and technical architecture.
+**[📂 slides/](slides/)** - Comprehensive slide deck explaining the CAFE concept
 
-## Slide Deck Overview
-
-Navigate the presentation slides here: **[Start Presentation →](slide-01-title.md)**
+Navigate the presentation slides here: **[Start Presentation →](slides/slide-01-title.md)**
 
 ### Core Presentation (Slides 1-9)
 
-1. **[Title Slide](slide-01-title.md)** - Introduction to Content Access Fair Exchange (CAFE)
+1. **[Title Slide](slides/slide-01-title.md)** - Introduction to Content Access Fair Exchange (CAFE)
 
-2. **[Content Distribution and Revenue](slide-02-the-content-value-matrix.md)** - Interactive flow diagram showing how content flows through direct and indirect channels, with declining referrals highlighted in red and growing indirect channels in green
+2. **[Content Distribution and Revenue](slides/slide-02-the-content-value-matrix.md)** - Interactive flow diagram showing how content flows through direct and indirect channels, with declining referrals highlighted in red and growing indirect channels in green
 
-3. **[Direct Traffic in Decline](slide-03-decline-in-referrals.md)** - Data-driven analysis showing:
+3. **[Direct Traffic in Decline](slides/slide-03-decline-in-referrals.md)** - Data-driven analysis showing:
    - Search referrals dropped from 90% (2010) to 41.5% (2024)
    - Social media referrals declining from 32% to 4%
    - Human vs Bot traffic breakdown by platform
 
-4. **[Opportunities for Publishers by Channel](slide-04-value-exchange-models.md)** - Comprehensive matrix comparing revenue opportunities across direct channels (App, Web, Newsletter) vs indirect channels (Search, Social, AI) including ads, subscriptions, and licensing potential
+4. **[Opportunities for Publishers by Channel](slides/slide-04-value-exchange-models.md)** - Comprehensive matrix comparing revenue opportunities across direct channels (App, Web, Newsletter) vs indirect channels (Search, Social, AI) including ads, subscriptions, and licensing potential
 
-5. **[Publisher Strategic Choices](slide-05-content-creator-choices.md)** - Visual flowchart of strategic options: strengthen direct business, control indirect channels, new monetization models, and content protection
+5. **[Publisher Strategic Choices](slides/slide-05-content-creator-choices.md)** - Visual flowchart of strategic options: strengthen direct business, control indirect channels, new monetization models, and content protection
 
-6. **[CAFE Value Proposition](slide-06-cafe-value-proposition.md)** - Side-by-side benefits breakdown:
+6. **[CAFE Value Proposition](slides/slide-06-cafe-value-proposition.md)** - Side-by-side benefits breakdown:
    - **Content Creators**: Revenue, measurement, data protection, cost efficiency
    - **Data Collectors**: Real-time access, quality data, cost efficiency, compliance
 
-7. **[Content Licensing Market Landscape](slide-07-market-landscape.md)** - Quadrant analysis positioning CAFE against existing solutions like New York Times-OpenAI deals, showing bespoke, collective, enterprise, and self-service approaches
+7. **[Content Licensing Market Landscape](slides/slide-07-market-landscape.md)** - Quadrant analysis positioning CAFE against existing solutions like New York Times-OpenAI deals, showing bespoke, collective, enterprise, and self-service approaches
 
-8. **[Content Access Workflow](slide-08-components-needed-for-content-access.md)** - Technical architecture diagram showing the interaction between Publishers, CAFE platform, and Data Collectors with Content Intelligence Engine and CDN components
+8. **[Content Access Workflow](slides/slide-08-components-needed-for-content-access.md)** - Technical architecture diagram showing the interaction between Publishers, CAFE platform, and Data Collectors with Content Intelligence Engine and CDN components
 
-9. **[Introducing OZONE.CAFE](slide-09-introducing-ozone-cafe.md)** - Platform introduction and implementation details
+9. **[Introducing OZONE.CAFE](slides/slide-09-introducing-ozone-cafe.md)** - Platform introduction and implementation details
 
 ### Additional Slides (10-16)
 - **High Level Architecture** - Technical implementation details
@@ -60,7 +58,7 @@ Navigate the presentation slides here: **[Start Presentation →](slide-01-title
 
 ## 🚀 CAFE Prototype
 
-**[📂 cafe-prototype/](cafe-prototype/)** - Working publisher dashboard prototype
+This repository contains a working publisher dashboard prototype demonstrating the CAFE concept.
 
 ### 📋 Prerequisites
 Before running the prototype, ensure you have:
@@ -76,28 +74,23 @@ Before running the prototype, ensure you have:
    cd cafe
    ```
 
-2. **Navigate to prototype directory**
-   ```bash
-   cd cafe-prototype
-   ```
-
-3. **Install dependencies**
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-4. **Start the database**
+3. **Start the database**
    ```bash
    docker-compose up -d
    ```
 
-5. **Set up environment variables**
+4. **Set up environment variables**
    ```bash
    cp .env.example .env
    # Edit .env with your database connection if needed
    ```
 
-6. **Initialize the database**
+5. **Initialize the database**
    ```bash
    cd backend
    npm run db:migrate
@@ -105,12 +98,12 @@ Before running the prototype, ensure you have:
    cd ..
    ```
 
-7. **Start the development servers**
+6. **Start the development servers**
    ```bash
    npm run dev
    ```
 
-8. **Open the dashboard**
+7. **Open the dashboard**
    
    Visit **http://localhost:5173** to see the CAFE publisher dashboard
 
@@ -145,9 +138,26 @@ npm run build
 npm run lint
 ```
 
-[→ View Complete Prototype Documentation](cafe-prototype/README.md)
+## 🏗️ Repository Structure
 
----
+```
+cafe/
+├── slides/                    # Business presentation slides
+│   ├── slide-01-title.md     # Introduction and overview
+│   ├── slide-02-*.md         # Market analysis and data
+│   └── ...                   # Complete slide deck
+├── backend/                  # Node.js + Express API
+│   ├── src/routes/          # REST API endpoints
+│   ├── prisma/schema.prisma # Database schema
+│   └── ...
+├── frontend/                # React + TypeScript dashboard
+│   ├── src/pages/           # Dashboard components
+│   ├── src/components/      # Reusable UI components
+│   └── ...
+├── shared/                  # Shared types and utilities
+├── docker-compose.yml       # Database setup
+└── README.md               # This file
+```
 
 ## Tools Used
 

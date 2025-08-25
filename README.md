@@ -1,35 +1,27 @@
-# Content Access Fair Exchange Slide Deck
+# CAFE - Content Access Fair Exchange
 
-A presentation deck for a new data protection and licensing system that prevents unauthorized web scraping and provides controlled API access to content.
+A complete solution for fair content licensing and distribution, including both the business presentation and a working prototype dashboard.
 
-## Project Overview
+## 📖 About CAFE
 
-This slide deck presents a comprehensive solution for content owners to protect their data from unauthorized usage while providing humans and legitimate data consumers with controlled access through a licensing framework and Data API.
+**Content Access Fair Exchange (CAFE)** addresses the fundamental problem of declining referral traffic from search engines and social platforms to content creators. As search referrals have dropped from 90% to 41.5% over 14 years, CAFE provides a new model for fair content access and compensation.
 
-## The Problem: The Broken Referral Model
+### The Problem
+- **Broken Referral Model**: Platforms consume content but provide fewer referrals back
+- **Unauthorized Scraping**: Bots extract content without compensation  
+- **Revenue Loss**: Publishers lose control over their content distribution
+- **Compliance Issues**: Data collectors lack proper licensing frameworks
 
-Historical research shows a dramatic decline in referral traffic from search engines to content creators:
-
-- **2010**: ~90% of Google searches resulted in clicks to external websites
-- **2024**: Only 41.5% of searches result in clicks to external websites
-- **Impact**: A 54% relative decrease in referral potential over 14 years
-
-This broken promise - where platforms gained free content but stopped sending proportional traffic back - necessitates a new model for fair content access and compensation.
-
-## System Components
-
-The proposed system includes:
-
+### The CAFE Solution
 - **Anti-Scraping Technology**: Advanced bot detection and prevention
-- **Licensing Framework**: Task-specific data use permissions and restrictions
+- **Licensing Framework**: Task-specific data use permissions and restrictions  
 - **Data API**: Controlled access interface for authorized users
-- **Security & Compliance**: Data protection and regulatory compliance features
+- **Fair Compensation**: Publishers get paid for content usage vs. referrals
+- **Security & Compliance**: Built-in data protection and regulatory compliance
 
-## Final System Naming
+## 📊 Presentation Slides
 
-**Content Access Fair Exchange (CAFE)**
-
-- **CAFE**: The industry standard protocol for content access and fair licensing exchange
+This repository contains a comprehensive slide deck explaining the CAFE concept, market opportunity, and technical architecture.
 
 ## Slide Deck Overview
 
@@ -68,30 +60,92 @@ Navigate the presentation slides here: **[Start Presentation →](slide-01-title
 
 ## 🚀 CAFE Prototype
 
-In addition to the presentation slides, this repository includes a working prototype of the CAFE platform:
+**[📂 cafe-prototype/](cafe-prototype/)** - Working publisher dashboard prototype
 
-**[📂 cafe-prototype/](cafe-prototype/)** - Full-stack publisher dashboard prototype
+### 📋 Prerequisites
+Before running the prototype, ensure you have:
+- **Node.js 18+** and **npm 9+** installed
+- **Docker & Docker Compose** for the database
+- **Git** for cloning the repository
 
-### Quick Start
-```bash
-cd cafe-prototype
-npm install
-docker-compose up -d  # Start database
-npm run dev           # Start both frontend & backend
-```
+### 🔧 Installation
 
-Visit http://localhost:5173 to see the CAFE publisher dashboard in action.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ozone-project/cafe.git
+   cd cafe
+   ```
 
-**Features:**
+2. **Navigate to prototype directory**
+   ```bash
+   cd cafe-prototype
+   ```
+
+3. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+4. **Start the database**
+   ```bash
+   docker-compose up -d
+   ```
+
+5. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your database connection if needed
+   ```
+
+6. **Initialize the database**
+   ```bash
+   cd backend
+   npm run db:migrate
+   npm run db:generate
+   cd ..
+   ```
+
+7. **Start the development servers**
+   ```bash
+   npm run dev
+   ```
+
+8. **Open the dashboard**
+   
+   Visit **http://localhost:5173** to see the CAFE publisher dashboard
+
+   API server runs on **http://localhost:3001**
+
+### ✨ Prototype Features
 - 📊 **Publisher Dashboard** with real-time metrics visualization
 - 📈 **Channel Management** for direct and indirect content distribution  
-- 💰 **Revenue Tracking** across all channels
-- 🤖 **Human vs Bot Analytics** 
-- ⚖️ **License Management** system
+- 💰 **Revenue Tracking** across all channels with growth indicators
+- 🤖 **Human vs Bot Analytics** showing traffic composition
+- 📋 **Channel Performance** breakdown with visual charts
+- ⚖️ **License Management** system architecture
 
-**Tech Stack:** React + TypeScript + Node.js + PostgreSQL + Prisma
+### 🛠️ Tech Stack
+- **Frontend**: React + TypeScript + Vite + Tailwind CSS + Recharts
+- **Backend**: Node.js + Express + TypeScript + Prisma ORM  
+- **Database**: PostgreSQL
+- **Development**: Docker Compose, Hot reload, Type safety
 
-[→ View Prototype Documentation](cafe-prototype/README.md)
+### 📚 Additional Commands
+```bash
+# View database in Prisma Studio
+npm run --workspace=backend db:studio
+
+# Run tests
+npm run test
+
+# Build for production  
+npm run build
+
+# Lint code
+npm run lint
+```
+
+[→ View Complete Prototype Documentation](cafe-prototype/README.md)
 
 ---
 

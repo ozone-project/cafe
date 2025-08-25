@@ -31,22 +31,40 @@ The proposed system includes:
 
 - **CAFE**: The industry standard protocol for content access and fair licensing exchange
 
-## Slide Deck Structure (19 slides)
+## Slide Deck Overview
 
-1. **Introducing CAFE** (Content Access Fair Exchange)
-1. **The Content Value Matrix** - Flow diagram that shows how content gets consumed and how it is monetised.  Also a table showing the pros and cons of each channel.
-1. **The Broken Promise** - Graph that shows the amount of traffic search, social, and AI give to users.
-1. **Content Creator Choices Today** -  Subscriptions (direct and indirect), Advertising (direct and indirect), Licensing.  Highlight areas in the Content Value Matrix that no longer work for content creators.
-1. **Market Landscape** - 2x2 matrix: Big/Small Content Owners vs Big/Small Data Collectors
-1. **Introducing OZONE.CAFE** - Content Access Fair Exchange - allow companies access to content and agreement on terms of use
-1. **Simple Content Creator UI** - Show list of businesses that would like to purchase access to content
-1. **Simple Data Collector UI** - Show a list of content creators (or aggregators) and select how to access the content
-1. **High Level Architecture** - push method, pull method
-1. **Content Data** - Overview of what additional data elements are included with a piece of content
-1. **Licenses** - Examples of ways which data collection companies can use content
-1. **Business Models** - show differences in charging for input (content) vs output (usage)
-1. **Appendix**
-1. **Research** - Links to content used to create this presentation
+Navigate the presentation slides here: **[Start Presentation →](slide-01-title.md)**
+
+### Core Presentation (Slides 1-9)
+
+1. **[Title Slide](slide-01-title.md)** - Introduction to Content Access Fair Exchange (CAFE)
+
+2. **[Content Distribution and Revenue](slide-02-the-content-value-matrix.md)** - Interactive flow diagram showing how content flows through direct and indirect channels, with declining referrals highlighted in red and growing indirect channels in green
+
+3. **[Direct Traffic in Decline](slide-03-decline-in-referrals.md)** - Data-driven analysis showing:
+   - Search referrals dropped from 90% (2010) to 41.5% (2024)
+   - Social media referrals declining from 32% to 4%
+   - Human vs Bot traffic breakdown by platform
+
+4. **[Opportunities for Publishers by Channel](slide-04-value-exchange-models.md)** - Comprehensive matrix comparing revenue opportunities across direct channels (App, Web, Newsletter) vs indirect channels (Search, Social, AI) including ads, subscriptions, and licensing potential
+
+5. **[Publisher Strategic Choices](slide-05-content-creator-choices.md)** - Visual flowchart of strategic options: strengthen direct business, control indirect channels, new monetization models, and content protection
+
+6. **[CAFE Value Proposition](slide-06-cafe-value-proposition.md)** - Side-by-side benefits breakdown:
+   - **Content Creators**: Revenue, measurement, data protection, cost efficiency
+   - **Data Collectors**: Real-time access, quality data, cost efficiency, compliance
+
+7. **[Content Licensing Market Landscape](slide-07-market-landscape.md)** - Quadrant analysis positioning CAFE against existing solutions like New York Times-OpenAI deals, showing bespoke, collective, enterprise, and self-service approaches
+
+8. **[Content Access Workflow](slide-08-components-needed-for-content-access.md)** - Technical architecture diagram showing the interaction between Publishers, CAFE platform, and Data Collectors with Content Intelligence Engine and CDN components
+
+9. **[Introducing OZONE.CAFE](slide-09-introducing-ozone-cafe.md)** - Platform introduction and implementation details
+
+### Additional Slides (10-16)
+- **High Level Architecture** - Technical implementation details
+- **Content Data & Licenses** - Data structures and licensing frameworks  
+- **Business Models** - Revenue and pricing strategies
+- **Appendix & Research** - Supporting documentation and sources
 
 ## Tools Used
 

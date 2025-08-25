@@ -12,10 +12,22 @@ graph LR
     linkStyle 1 stroke:darkred,stroke-width:2px
 ```
 
-<br/>
+```mermaid
+flowchart TD
+    subgraph Notes[" "]
+        direction TB
+        Content["<div style='text-align:left; width:600px'>
+        • Platforms keep users on their site longer, therefore lower referrals<br/>
+        • Users can read content on platforms, no need to navigate to publisher
+            directly
+        </div>"]
+    end
 
-#### • Platforms keep users on their site longer, therefore lower referrals
-#### • Users can read content on platforms, no need to navigate to publisher directly
+    style Notes fill:none,stroke:#666,stroke-width:2px,color:#666
+    style Content fill:none,stroke:none
+
+```
+
 
 <br/><br/><br/>
 
@@ -31,11 +43,21 @@ xychart-beta
 
 ###### *Note: Graph generated from AI research of many sources.  Direct citation needed*
 
-<br/>
+```mermaid
+flowchart TD
+    subgraph Notes[" "]
+        direction TB
+        Content["<div style='text-align:left; width:600px'>
+        • Zero click searches have increased significantly over the last 10 years<br/>
+        • Even though search continues to grow, the percentage of search users that
+            navigate to a publisher continues to decrease
+        </div>"]
+    end
 
-#### • Zero click searches have increased significantly over the last 10 years
-#### • Even though search continues to grow, the percentage of search users that navigate to a publisher continues to decrease
+    style Notes fill:none,stroke:#666,stroke-width:2px,color:#666
+    style Content fill:none,stroke:none
 
+```
 
 <br/><br/><br/>
 
@@ -51,11 +73,21 @@ xychart-beta
 
 ###### *Note: Graph generated from AI research of many sources.  Direct citation needed*
 
-<br/>
+```mermaid
+flowchart TD
+    subgraph Notes[" "]
+        direction TB
+        Content["<div style='text-align:left; width:600px'>
+        • Referrals from Social media have never been as good as search<br/>
+        • Regardless referrals continue to decline as Social platforms try harder to
+          keep traffic on their own site
+        </div>"]
+    end
 
-#### • Referrals from Social media have never been as good as search
-#### • Regardless referrals continue to decline as Social platforms try harder to keep traffic on their own site
+    style Notes fill:none,stroke:#666,stroke-width:2px,color:#666
+    style Content fill:none,stroke:none
 
+```
 
 <br/><br/><br/>
 

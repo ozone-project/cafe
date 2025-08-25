@@ -43,8 +43,6 @@ flowchart LR
 
 ```
 
-*Note: Directional data only - citation needed*
-
 <br/><br/><br/>
 
 ```mermaid

@@ -35,12 +35,11 @@ flowchart LR
       Referrals -.-> H2["Human"]
 
       style H2 stroke-width:2px, stroke-dasharray:2, color:gray
-      style Direct_Channels stroke-width:4px, stroke:darkred, fill:#333333
-      style Indirect_Channels stroke-width:4px, stroke:darkgreen, fill:#333333
-      style Advertising stroke-width:4px, stroke:darkred
-      style Referrals stroke-width:4px, stroke:darkred
-      style Licensing stroke-width:4px, stroke:darkgreen
-
+      style Direct_Channels stroke-width:2px, stroke:darkred
+      style Indirect_Channels stroke-width:2px, stroke:darkgreen
+      style Advertising stroke-width:2px, stroke:darkred
+      style Referrals stroke-width:2px, stroke:darkred
+      style Licensing stroke-width:2px, stroke:darkgreen
 ```
 
 <br/><br/><br/>

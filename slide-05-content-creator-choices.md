@@ -19,8 +19,8 @@ flowchart TD
         AI["AI Models"]
     end
     
-    style Referrals stroke:#666666, fill:#333333, color:#999999
-    style Licensing stroke:darkblue, stroke-width:4px
+    style Referrals stroke:#666666, color:#999999
+    style Licensing stroke:darkblue, stroke-width:2px
 
     classDef small_title font-size:0.9em, color:#cccccc
     class Direct small_title
@@ -42,6 +42,8 @@ flowchart TD
 
     style Notes fill:none,stroke:#666,stroke-width:2px,color:#666
     style Content fill:none,stroke:none
+    classDef small_title font-size:0.9em, color:#cccccc
+    class Notes small_title
 
 ```
 

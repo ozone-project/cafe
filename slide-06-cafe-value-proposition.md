@@ -1,6 +1,6 @@
 [Home](slide-01-title.md) | [Prev](slide-05-content-creator-choices.md) | [Next](slide-07-market-landscape.md) | [End](slide-16-appendix-research.md)
 
-# CAFE Value Proposition
+# Content Exchange Value Proposition
 
 
 

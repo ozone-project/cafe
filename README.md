@@ -79,23 +79,21 @@ Before running the prototype, ensure you have:
    npm install
    ```
 
-3. **Start the database**
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Set up environment variables**
+3. **Set up environment variables**
    ```bash
    cp .env.example .env
    # Edit .env with your database connection if needed
    ```
 
+4. **Start the database**
+   ```bash
+   docker-compose up -d
+   ```
+
 5. **Initialize the database**
    ```bash
-   cd backend
-   npm run db:migrate
-   npm run db:generate
-   cd ..
+   npm run --workspace=backend db:generate
+   npm run --workspace=backend db:migrate
    ```
 
 6. **Start the development servers**

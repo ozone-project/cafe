@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Collector Dashboard - CAFE</title>
+    <link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-wrapper">
+            <div class="header">
+                <h1>Data Collector Dashboard</h1>
+                <div class="user-info">
+                    <div>Welcome, <span id="userName"></span></div>
+                    <div><span id="userEmail"></span></div>
+                    <div class="company-info">
+                        <span id="dataCollectorCompany"></span>
+                    </div>
+                    <button class="btn btn-danger btn-sm logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <!-- Overview Stats -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Access Overview</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card success">
+                        <div class="stat-number" id="allowedCount">-</div>
+                        <div class="stat-label">Domains Allowing Access</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-number" id="blockedCount">-</div>
+                        <div class="stat-label">Domains Blocking Access</div>
+                    </div>
+                    <div class="stat-card primary">
+                        <div class="stat-number" id="totalDomains">-</div>
+                        <div class="stat-label">Total Monitored Domains</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters and Controls -->
+            <div class="card">
+                <div class="controls-bar">
+                    <div class="controls-group">
+                        <select id="statusFilter" class="form-select">
+                            <option value="all">All Domains</option>
+                            <option value="allowed">Allowed Only</option>
+                            <option value="blocked">Blocked Only</option>
+                        </select>
+                        
+                        <input type="text" id="domainSearch" placeholder="Search domains..." class="form-input search-input">
+                    </div>
+                    
+                    <button onclick="loadDomainPermissions()" class="btn btn-primary">
+                        Refresh Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Domains List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Publisher Domains</h2>
+                </div>
+                <div id="loadingMessage" class="loading" style="display: none;">
+                    Loading domain permissions
+                </div>
+                <div id="domainsTable" class="data-table">
+                    <div class="table-header" style="grid-template-columns: 3fr 1fr 1fr 1.5fr;">
+                        <div>Domain</div>
+                        <div>Bots</div>
+                        <div>Status</div>
+                        <div>Actions</div>
+                    </div>
+                    <div id="domainsRows" class="table-body"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load external scripts -->
+    <script src="js/cafe-ui.js"></script>
+    <script>
+        // Application State
+        let currentUser = null;
+        let domainPermissions = [];
+        let filteredDomains = [];
+
+        // Authentication & Initialization
+        class AuthManager {
+            static checkAuth() {
+                const userData = localStorage.getItem('user');
+                if (!userData) {
+                    window.location.href = '/';
+                    return null;
+                }
+                
+                const user = JSON.parse(userData);
+                if (user.account_type !== 'data_collector') {
+                    alert('Access denied. Data collectors only.');
+                    window.location.href = '/';
+                    return null;
+                }
+                
+                return user;
+            }
+            
+            static logout() {
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+            
+            static displayUserInfo(user) {
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userEmail').textContent = user.email;
+                
+                // Show data collector company if available
+                if (user.data_collector_name) {
+                    document.getElementById('dataCollectorCompany').textContent = user.data_collector_name;
+                } else {
+                    document.getElementById('dataCollectorCompany').textContent = 'Data Collector';
+                }
+            }
+        }
+
+        // Domain Permissions Management
+        class DataCollectorDashboard {
+            constructor(user) {
+                this.user = user;
+                this.groupedDomains = {};
+                this.expandedDomains = new Set();
+            }
+
+            async loadDomainPermissions() {
+                const loadingMessage = document.getElementById('loadingMessage');
+                loadingMessage.style.display = 'block';
+                
+                try {
+                    const result = await CafeUtils.apiCall(`/data-collectors/${this.user.id}/domains`);
+                    
+                    if (result.success) {
+                        domainPermissions = result.data;
+                        this.groupDomainsByDomain();
+                        this.updateStats();
+                        this.applyFilters();
+                    } else {
+                        this.showError('Error loading domain permissions: ' + result.error);
+                    }
+                } catch (error) {
+                    this.showError('Network error loading domain permissions.');
+                } finally {
+                    loadingMessage.style.display = 'none';
+                }
+            }
+
+            groupDomainsByDomain() {
+                this.groupedDomains = {};
+                
+                domainPermissions.forEach(item => {
+                    if (!this.groupedDomains[item.domain]) {
+                        this.groupedDomains[item.domain] = {
+                            domain: item.domain,
+                            domain_id: item.domain_id,
+                            publisher_name: item.publisher_name,
+                            publisher_email: item.publisher_email,
+                            bots: [],
+                            allAllowed: true,
+                            allBlocked: true
+                        };
+                    }
+                    
+                    this.groupedDomains[item.domain].bots.push({
+                        user_agent: item.user_agent,
+                        allow: item.allow,
+                        updated_at: item.updated_at
+                    });
+                    
+                    // Track if all bots are allowed or all blocked
+                    if (item.allow) {
+                        this.groupedDomains[item.domain].allBlocked = false;
+                    } else {
+                        this.groupedDomains[item.domain].allAllowed = false;
+                    }
+                });
+            }
+
+            updateStats() {
+                const domains = Object.values(this.groupedDomains);
+                const allowedDomains = domains.filter(d => d.allAllowed && !d.allBlocked).length;
+                const blockedDomains = domains.filter(d => d.allBlocked && !d.allAllowed).length;
+                const mixedDomains = domains.filter(d => !d.allAllowed && !d.allBlocked).length;
+                const totalDomains = domains.length;
+
+                document.getElementById('allowedCount').textContent = allowedDomains;
+                document.getElementById('blockedCount').textContent = blockedDomains;
+                document.getElementById('totalDomains').textContent = totalDomains;
+            }
+
+            applyFilters() {
+                const statusFilter = document.getElementById('statusFilter').value;
+                const searchTerm = document.getElementById('domainSearch').value.toLowerCase();
+
+                const domains = Object.values(this.groupedDomains);
+                
+                filteredDomains = domains.filter(domain => {
+                    // Status filter
+                    let statusMatch = true;
+                    if (statusFilter === 'allowed') {
+                        statusMatch = domain.allAllowed && !domain.allBlocked;
+                    } else if (statusFilter === 'blocked') {
+                        statusMatch = domain.allBlocked && !domain.allAllowed;
+                    }
+
+                    // Search filter
+                    const searchMatch = domain.domain.toLowerCase().includes(searchTerm);
+
+                    return statusMatch && searchMatch;
+                });
+
+                this.renderDomains();
+            }
+
+            renderDomains() {
+                const domainsRows = document.getElementById('domainsRows');
+                
+                if (filteredDomains.length === 0) {
+                    domainsRows.innerHTML = '<div class="empty-state">No domains match your current filters.</div>';
+                    document.getElementById('domainsTable').style.display = 'none';
+                    return;
+                }
+
+                document.getElementById('domainsTable').style.display = 'block';
+                
+                let html = '';
+                filteredDomains.forEach(domain => {
+                    html += this.renderDomainRow(domain);
+                });
+                
+                domainsRows.innerHTML = html;
+                
+                // Add click handlers for expand/collapse
+                this.attachEventHandlers();
+            }
+
+            renderDomainRow(domain) {
+                const domainKey = `domain-${domain.domain_id}`;
+                const isExpanded = this.expandedDomains.has(domainKey);
+                
+                // Determine overall status
+                let statusText, statusClass, statusIcon;
+                if (domain.allAllowed && !domain.allBlocked) {
+                    statusText = 'Allowed';
+                    statusClass = 'allowed';
+                    statusIcon = '✅';
+                } else if (domain.allBlocked && !domain.allAllowed) {
+                    statusText = 'Blocked';
+                    statusClass = 'blocked';
+                    statusIcon = '🚫';
+                } else {
+                    statusText = 'Mixed';
+                    statusClass = 'mixed';
+                    statusIcon = '⚠️';
+                }
+                
+                let html = `
+                    <div class="table-row" data-domain-id="${domain.domain_id}" style="grid-template-columns: 3fr 1fr 1fr 1.5fr;">
+                        <div class="status-indicator ${statusClass}"></div>
+                        <div class="domain-display">
+                            <img src="https://${domain.domain}/favicon.ico" 
+                                 class="favicon" 
+                                 onerror="this.style.display='none'">
+                            <span>${domain.domain}</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="expandable-trigger" data-domain-id="${domain.domain_id}" style="cursor: pointer; background: var(--neutral-300); padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px;">
+                                ${domain.bots.length} bot${domain.bots.length !== 1 ? 's' : ''}
+                            </span>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="status-badge ${statusClass}">
+                                ${statusText}
+                            </span>
+                        </div>
+                        <div class="action-buttons">
+                            <a href="https://${domain.domain}/robots.txt" target="_blank" class="btn btn-ghost btn-sm">
+                                View robots.txt
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                // Add bot details if expanded
+                if (isExpanded) {
+                    html += `<div class="expandable-content" id="bots-${domain.domain_id}">`;
+                    domain.bots.forEach(bot => {
+                        const botStatusClass = bot.allow ? 'allowed' : 'blocked';
+                        const botStatusText = bot.allow ? 'Allowed' : 'Blocked';
+                        
+                        html += `
+                            <div class="table-row" style="grid-template-columns: 3fr 1.5fr 2fr; margin: var(--space-sm) 0; background: var(--neutral-100); border-radius: var(--radius-sm);">
+                                <div class="status-indicator ${botStatusClass}"></div>
+                                <div style="font-family: var(--font-mono); font-size: 12px;">
+                                    ${bot.user_agent}
+                                </div>
+                                <div style="text-align: center;">
+                                    <span class="status-badge ${botStatusClass}">
+                                        ${botStatusText}
+                                    </span>
+                                </div>
+                                <div style="text-align: right; font-size: 12px; color: var(--neutral-700);">
+                                    ${CafeUtils.formatDateTime(bot.updated_at)}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                
+                return html;
+            }
+
+            attachEventHandlers() {
+                // Add click handlers for bot count to expand/collapse
+                document.querySelectorAll('.expandable-trigger').forEach(element => {
+                    element.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const domainId = element.dataset.domainId;
+                        this.toggleBotDetails(domainId);
+                    });
+                });
+            }
+
+            toggleBotDetails(domainId) {
+                const domainKey = `domain-${domainId}`;
+                
+                if (this.expandedDomains.has(domainKey)) {
+                    this.expandedDomains.delete(domainKey);
+                } else {
+                    this.expandedDomains.add(domainKey);
+                }
+                
+                // Re-render to show/hide bot details
+                this.renderDomains();
+            }
+
+            showError(message) {
+                document.getElementById('domainsRows').innerHTML = 
+                    `<div class="message error">${message}</div>`;
+                document.getElementById('domainsTable').style.display = 'none';
+            }
+        }
+
+        // Application Initialization
+        let dashboard = null;
+
+        window.onload = function() {
+            currentUser = AuthManager.checkAuth();
+            if (!currentUser) return;
+            
+            AuthManager.displayUserInfo(currentUser);
+            dashboard = new DataCollectorDashboard(currentUser);
+            dashboard.loadDomainPermissions();
+            
+            setupEventListeners();
+        };
+
+        function setupEventListeners() {
+            // Filter and search handlers
+            document.getElementById('statusFilter').addEventListener('change', () => {
+                dashboard.applyFilters();
+            });
+            
+            document.getElementById('domainSearch').addEventListener('input', () => {
+                dashboard.applyFilters();
+            });
+        }
+
+        // Global functions
+        function logout() {
+            AuthManager.logout();
+        }
+
+        function loadDomainPermissions() {
+            if (dashboard) {
+                dashboard.loadDomainPermissions();
+            }
+        }
+    </script>
+</body>
+</html>

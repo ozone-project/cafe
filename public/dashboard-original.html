@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAFE - Publisher Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+        .user-info {
+            color: #666;
+            text-align: right;
+        }
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .message {
+            padding: 10px;
+            margin: 20px 0;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .domain-list {
+            margin-top: 20px;
+        }
+        .domain-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 4px solid #28a745;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .domain-item:hover {
+            background: #e9ecef;
+        }
+        .domain-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .domain-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .domain-date {
+            color: #666;
+            font-size: 14px;
+        }
+        .domain-robots {
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
+        }
+        .refresh-btn {
+            background: #17a2b8;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .refresh-btn:hover {
+            background: #138496;
+        }
+        .refresh-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .view-btn {
+            background: #6f42c1;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .view-btn:hover {
+            background: #5a32a3;
+        }
+        .view-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .remove-btn:hover {
+            background: #c82333;
+        }
+        .button-group {
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .domain-item:hover .button-group {
+            opacity: 1;
+        }
+        .add-domain-form {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+        .add-domain-form .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Publisher Dashboard</h1>
+            <div class="user-info">
+                <div>Welcome, <span id="userName"></span></div>
+                <div><span id="userEmail"></span></div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Add Domain to Track</h2>
+            <p style="color: #666; margin-bottom: 20px;">
+                Add domains that you own and want to track through CAFE.
+            </p>
+            
+            <form id="domainForm" class="add-domain-form">
+                <div class="form-group">
+                    <label for="domains">Domain Names (one per line)</label>
+                    <textarea id="domains" name="domains" placeholder="example.com&#10;mysite.org&#10;blog.net" rows="5" required style="resize: vertical; font-family: monospace;"></textarea>
+                </div>
+                <button type="submit">Add Domains</button>
+            </form>
+            
+            <div id="domainMessage"></div>
+        </div>
+        
+        <div class="section">
+            <h2>Your Tracked Domains</h2>
+            <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                <button type="button" onclick="loadDomains()" style="background: #28a745;">
+                    Refresh Domains
+                </button>
+                <button type="button" onclick="refreshAllRobots()" id="refreshAllBtn" style="background: #17a2b8;">
+                    Refresh All robots.txt
+                </button>
+            </div>
+            <div id="domainsList" class="domain-list"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        
+        // Check if user is logged in
+        window.onload = function() {
+            const userData = localStorage.getItem('user');
+            if (!userData) {
+                window.location.href = '/';
+                return;
+            }
+            
+            currentUser = JSON.parse(userData);
+            if (currentUser.account_type !== 'publisher') {
+                alert('Access denied. Publishers only.');
+                window.location.href = '/';
+                return;
+            }
+            
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            loadDomains();
+        };
+        
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+        
+        document.getElementById('domainForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const domainsText = formData.get('domains');
+            
+            // Split domains by line and clean up
+            const domains = domainsText
+                .split('\n')
+                .map(domain => domain.trim())
+                .filter(domain => domain.length > 0);
+            
+            if (domains.length === 0) {
+                document.getElementById('domainMessage').innerHTML = 
+                    '<div class="message error">Please enter at least one domain.</div>';
+                return;
+            }
+            
+            // Validate all domains
+            const invalidDomains = domains.filter(domain => 
+                !/^[a-zA-Z0-9][a-zA-Z0-9-._]*[a-zA-Z0-9]$/.test(domain)
+            );
+            
+            if (invalidDomains.length > 0) {
+                document.getElementById('domainMessage').innerHTML = 
+                    '<div class="message error">Invalid domain names: ' + invalidDomains.join(', ') + '</div>';
+                return;
+            }
+            
+            // Show progress
+            const messageDiv = document.getElementById('domainMessage');
+            messageDiv.innerHTML = '<div class="message">Adding ' + domains.length + ' domains...</div>';
+            
+            let successCount = 0;
+            let errors = [];
+            
+            // Add domains one by one
+            for (let domain of domains) {
+                try {
+                    const response = await fetch('/domains', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            user_id: currentUser.id,
+                            domain: domain
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        errors.push(domain + ': ' + result.error);
+                    }
+                } catch (error) {
+                    errors.push(domain + ': Network error');
+                }
+            }
+            
+            // Show results
+            let message = '';
+            if (successCount > 0) {
+                message += '<div class="message success">' + successCount + ' domain(s) added successfully.</div>';
+            }
+            if (errors.length > 0) {
+                message += '<div class="message error">Errors:<br>' + errors.join('<br>') + '</div>';
+            }
+            
+            messageDiv.innerHTML = message;
+            
+            if (successCount > 0) {
+                e.target.reset();
+                loadDomains();
+            }
+        });
+        
+        async function loadDomains() {
+            try {
+                const response = await fetch('/domains/' + currentUser.id);
+                const domains = await response.json();
+                
+                const domainsList = document.getElementById('domainsList');
+                
+                if (domains.length === 0) {
+                    domainsList.innerHTML = '<p style="color: #666; text-align: center;">No domains added yet. Add your first domain above!</p>';
+                    return;
+                }
+                
+                domainsList.innerHTML = domains.map(domain => {
+                    let robotsInfo = '';
+                    if (domain.robots_loaded_at) {
+                        const loadedDate = new Date(domain.robots_loaded_at).toLocaleString();
+                        robotsInfo = `
+                            <div class="domain-robots">
+                                <strong>robots.txt:</strong> ${domain.robots_line_count} lines | 
+                                Last loaded: ${loadedDate}
+                            </div>
+                        `;
+                    } else {
+                        robotsInfo = `
+                            <div class="domain-robots">
+                                <strong>robots.txt:</strong> Not loaded yet
+                            </div>
+                        `;
+                    }
+                    
+                    const hasRobotsContent = domain.robots_content && domain.robots_content.trim().length > 0;
+                    
+                    return `
+                        <div class="domain-item" data-domain-id="${domain.id}" onclick="viewDomainBots(${domain.id}, '${domain.domain}')">
+                            <div class="domain-header">
+                                <div>
+                                    <div class="domain-name">${domain.domain}</div>
+                                    <div class="domain-date">Added: ${new Date(domain.created_at).toLocaleDateString()}</div>
+                                </div>
+                                <div class="button-group" onclick="event.stopPropagation()">
+                                    <button class="refresh-btn" onclick="refreshRobots(${domain.id}, this)">
+                                        Refresh
+                                    </button>
+                                    <button class="view-btn" onclick="viewRobots(${domain.id})" ${!hasRobotsContent ? 'disabled' : ''}>
+                                        View
+                                    </button>
+                                    <button class="remove-btn" onclick="removeDomain(${domain.id}, '${domain.domain}')">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                            ${robotsInfo}
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                document.getElementById('domainsList').innerHTML = 
+                    '<div class="message error">Error loading domains.</div>';
+            }
+        }
+        
+        async function refreshRobots(domainId, buttonElement) {
+            // Disable button and show loading
+            buttonElement.disabled = true;
+            buttonElement.textContent = 'Loading...';
+            
+            try {
+                const response = await fetch(`/domains/${domainId}/refresh-robots`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Reload domains to show updated info
+                    loadDomains();
+                } else {
+                    alert('Error: ' + result.error);
+                    buttonElement.disabled = false;
+                    buttonElement.textContent = 'Refresh';
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+                buttonElement.disabled = false;
+                buttonElement.textContent = 'Refresh';
+            }
+        }
+        
+        async function viewRobots(domainId) {
+            try {
+                const response = await fetch(`/domains/${domainId}/robots`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const loadedDate = new Date(result.loaded_at).toLocaleString();
+                    
+                    // Try to open popup window first
+                    const robotsWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+                    
+                    if (robotsWindow && !robotsWindow.closed) {
+                        // Popup window opened successfully
+                        robotsWindow.document.write(`
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                                <title>robots.txt - ${result.domain}</title>
+                                <style>
+                                    body {
+                                        font-family: 'Courier New', monospace;
+                                        margin: 20px;
+                                        background-color: #f8f9fa;
+                                    }
+                                    .header {
+                                        background: white;
+                                        padding: 15px;
+                                        border-radius: 5px;
+                                        margin-bottom: 20px;
+                                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                                    }
+                                    .content {
+                                        background: white;
+                                        padding: 20px;
+                                        border-radius: 5px;
+                                        white-space: pre-wrap;
+                                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                                        max-height: 70vh;
+                                        overflow-y: auto;
+                                    }
+                                    h1 {
+                                        margin: 0 0 10px 0;
+                                        color: #333;
+                                    }
+                                    .info {
+                                        color: #666;
+                                        font-size: 14px;
+                                    }
+                                    .close-btn {
+                                        background: #dc3545;
+                                        color: white;
+                                        border: none;
+                                        padding: 8px 16px;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        float: right;
+                                    }
+                                    .close-btn:hover {
+                                        background: #c82333;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="header">
+                                    <h1>robots.txt for ${result.domain}</h1>
+                                    <div class="info">
+                                        Last loaded: ${loadedDate} | 
+                                        <a href="https://${result.domain}/robots.txt" target="_blank">View original</a>
+                                    </div>
+                                    <button class="close-btn" onclick="window.close()">Close</button>
+                                    <div style="clear: both;"></div>
+                                </div>
+                                <div class="content">${result.content}</div>
+                            </body>
+                            </html>
+                        `);
+                        robotsWindow.document.close();
+                        robotsWindow.focus();
+                    } else {
+                        // Popup blocked, use modal instead
+                        showRobotsModal(result.domain, result.content, loadedDate);
+                    }
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+        
+        function showRobotsModal(domain, content, loadedDate) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.id = 'robots-modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+                z-index: 1000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            `;
+            
+            // Function to close modal
+            const closeModal = () => {
+                const existingModal = document.getElementById('robots-modal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+            };
+            
+            // Create modal content
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    width: 90%;
+                    max-width: 800px;
+                    height: 80%;
+                    border-radius: 8px;
+                    display: flex;
+                    flex-direction: column;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                ">
+                    <div style="
+                        padding: 20px;
+                        border-bottom: 1px solid #ddd;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        background: #f8f9fa;
+                        border-radius: 8px 8px 0 0;
+                    ">
+                        <div>
+                            <h2 style="margin: 0; color: #333;">robots.txt for ${domain}</h2>
+                            <div style="color: #666; font-size: 14px; margin-top: 5px;">
+                                Last loaded: ${loadedDate} | 
+                                <a href="https://${domain}/robots.txt" target="_blank">View original</a>
+                            </div>
+                        </div>
+                        <button id="close-modal-btn" style="
+                            background: #dc3545;
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                        ">Close</button>
+                    </div>
+                    <div style="
+                        flex: 1;
+                        padding: 20px;
+                        overflow-y: auto;
+                        font-family: 'Courier New', monospace;
+                        white-space: pre-wrap;
+                        background: #fff;
+                        border-radius: 0 0 8px 8px;
+                    ">${content}</div>
+                </div>
+            `;
+            
+            // Add event listeners after modal is created
+            document.body.appendChild(modal);
+            
+            // Close button click
+            document.getElementById('close-modal-btn').addEventListener('click', closeModal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Close modal with escape key
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    document.removeEventListener('keydown', escapeHandler);
+                }
+            };
+            document.addEventListener('keydown', escapeHandler);
+        }
+        
+        async function viewDomainBots(domainId, domainName) {
+            try {
+                const response = await fetch(`/domains/${domainId}/bots`);
+                const bots = await response.json();
+                
+                if (!response.ok) {
+                    alert('Error: ' + bots.error);
+                    return;
+                }
+                
+                showBotsModal(domainId, domainName, bots);
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+        
+        function showBotsModal(domainId, domainName, bots) {
+            // Create modal overlay
+            const modal = document.createElement('div');
+            modal.id = 'bots-modal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+                z-index: 1000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            `;
+            
+            // Function to close modal
+            const closeModal = () => {
+                const existingModal = document.getElementById('bots-modal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+            };
+            
+            let botsContent = '';
+            if (bots.length === 0) {
+                botsContent = '<div style="text-align: center; color: #666; padding: 20px;">No bots found. Try refreshing the robots.txt file first.</div>';
+            } else {
+                // Group bots by company
+                const botsByCompany = {};
+                let unassignedBots = [];
+                
+                bots.forEach(bot => {
+                    if (bot.data_collector_name) {
+                        if (!botsByCompany[bot.data_collector_name]) {
+                            botsByCompany[bot.data_collector_name] = [];
+                        }
+                        botsByCompany[bot.data_collector_name].push(bot);
+                    } else {
+                        unassignedBots.push(bot);
+                    }
+                });
+                
+                // Count companies and bots
+                const companyCount = Object.keys(botsByCompany).length;
+                const totalBots = bots.length;
+                
+                botsContent = `
+                    <div style="
+                        display: flex; 
+                        justify-content: space-between; 
+                        align-items: center; 
+                        margin-bottom: 20px;
+                    ">
+                        <div style="color: #666; font-size: 14px;">
+                            Found ${totalBots} bot(s) from ${companyCount} companies in ${domainName}/robots.txt
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="toggleAllCompanies(true)" 
+                                    style="
+                                        background: #28a745;
+                                        color: white;
+                                        border: none;
+                                        padding: 4px 8px;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        font-size: 11px;
+                                        text-transform: uppercase;
+                                        font-weight: bold;
+                                    "
+                                    onmouseover="this.style.background='#218838'"
+                                    onmouseout="this.style.background='#28a745'"
+                                    title="Expand all companies">
+                                Expand All
+                            </button>
+                            <button onclick="toggleAllCompanies(false)" 
+                                    style="
+                                        background: #6c757d;
+                                        color: white;
+                                        border: none;
+                                        padding: 4px 8px;
+                                        border-radius: 4px;
+                                        cursor: pointer;
+                                        font-size: 11px;
+                                        text-transform: uppercase;
+                                        font-weight: bold;
+                                    "
+                                    onmouseover="this.style.background='#5a6268'"
+                                    onmouseout="this.style.background='#6c757d'"
+                                    title="Collapse all companies">
+                                Collapse All
+                            </button>
+                        </div>
+                    </div>
+                    <div style="max-height: 450px; overflow-y: auto;">
+                        ${Object.keys(botsByCompany).sort().map((companyName, index) => `
+                            <div style="margin-bottom: 20px;">
+                                <div style="
+                                    font-weight: bold;
+                                    font-size: 16px;
+                                    color: #333;
+                                    margin-bottom: 8px;
+                                    padding-bottom: 4px;
+                                    border-bottom: 2px solid #007bff;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                ">
+                                    <div style="
+                                        width: 4px;
+                                        height: 18px;
+                                        background: #007bff;
+                                        border-radius: 2px;
+                                    "></div>
+                                    ${companyName}
+                                    <span id="toggle-company-${index}" 
+                                          onclick="toggleCompanyBots('company-${index}')"
+                                          style="
+                                        font-size: 12px;
+                                        font-weight: normal;
+                                        color: #666;
+                                        background: #e9ecef;
+                                        padding: 2px 6px;
+                                        border-radius: 10px;
+                                        cursor: pointer;
+                                        transition: background-color 0.2s ease;
+                                        user-select: none;
+                                    "
+                                    onmouseover="this.style.background='#dee2e6'"
+                                    onmouseout="this.style.background='#e9ecef'"
+                                    title="Click to expand/collapse bots">
+                                        ${botsByCompany[companyName].length} bot${botsByCompany[companyName].length !== 1 ? 's' : ''}
+                                    </span>
+                                </div>
+                                <div id="company-${index}" style="margin-left: 12px;">
+                                    ${botsByCompany[companyName].map(bot => `
+                                        <div id="bot-row-${bot.bot_id}" style="
+                                            display: flex;
+                                            justify-content: space-between;
+                                            align-items: center;
+                                            padding: 10px 12px;
+                                            margin: 6px 0;
+                                            background: ${bot.allow ? '#d4edda' : '#f8d7da'};
+                                            border: 1px solid ${bot.allow ? '#c3e6cb' : '#f5c6cb'};
+                                            border-radius: 6px;
+                                            border-left: 4px solid ${bot.allow ? '#28a745' : '#dc3545'};
+                                            transition: all 0.3s ease;
+                                        ">
+                                            <div>
+                                                <div style="font-weight: bold; font-family: 'Courier New', monospace; font-size: 14px;">
+                                                    ${bot.user_agent}
+                                                </div>
+                                                <div style="font-size: 11px; color: #666; margin-top: 3px;">
+                                                    Parsed: ${new Date(bot.created_at).toLocaleDateString()}
+                                                </div>
+                                            </div>
+                                            <button id="status-btn-${bot.bot_id}" 
+                                                    data-domain-id="${domainId}" 
+                                                    data-bot-id="${bot.bot_id}" 
+                                                    data-current-allow="${bot.allow}"
+                                                    onclick="toggleBotPermission(${domainId}, ${bot.bot_id}, ${!bot.allow})"
+                                                    style="
+                                                padding: 4px 10px;
+                                                border: none;
+                                                border-radius: 12px;
+                                                font-size: 11px;
+                                                font-weight: bold;
+                                                background: ${bot.allow ? '#28a745' : '#dc3545'};
+                                                color: white;
+                                                text-transform: uppercase;
+                                                cursor: pointer;
+                                                transition: all 0.2s ease;
+                                            " 
+                                            onmouseover="this.style.opacity='0.8'" 
+                                            onmouseout="this.style.opacity='1'"
+                                            title="Click to ${bot.allow ? 'block' : 'allow'} this bot">
+                                                ${bot.allow ? 'Allowed' : 'Blocked'}
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                        
+                        ${unassignedBots.length > 0 ? `
+                            <div style="margin-bottom: 20px;">
+                                <div style="
+                                    font-weight: bold;
+                                    font-size: 16px;
+                                    color: #666;
+                                    margin-bottom: 8px;
+                                    padding-bottom: 4px;
+                                    border-bottom: 2px solid #6c757d;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                ">
+                                    <div style="
+                                        width: 4px;
+                                        height: 18px;
+                                        background: #6c757d;
+                                        border-radius: 2px;
+                                    "></div>
+                                    Other/Unknown
+                                    <span id="toggle-company-unknown" 
+                                          onclick="toggleCompanyBots('company-unknown')"
+                                          style="
+                                        font-size: 12px;
+                                        font-weight: normal;
+                                        color: #666;
+                                        background: #e9ecef;
+                                        padding: 2px 6px;
+                                        border-radius: 10px;
+                                        cursor: pointer;
+                                        transition: background-color 0.2s ease;
+                                        user-select: none;
+                                    "
+                                    onmouseover="this.style.background='#dee2e6'"
+                                    onmouseout="this.style.background='#e9ecef'"
+                                    title="Click to expand/collapse bots">
+                                        ${unassignedBots.length} bot${unassignedBots.length !== 1 ? 's' : ''}
+                                    </span>
+                                </div>
+                                <div id="company-unknown" style="margin-left: 12px;">
+                                    ${unassignedBots.map(bot => `
+                                        <div id="bot-row-${bot.bot_id}" style="
+                                            display: flex;
+                                            justify-content: space-between;
+                                            align-items: center;
+                                            padding: 10px 12px;
+                                            margin: 6px 0;
+                                            background: ${bot.allow ? '#d4edda' : '#f8d7da'};
+                                            border: 1px solid ${bot.allow ? '#c3e6cb' : '#f5c6cb'};
+                                            border-radius: 6px;
+                                            border-left: 4px solid ${bot.allow ? '#28a745' : '#dc3545'};
+                                            transition: all 0.3s ease;
+                                        ">
+                                            <div>
+                                                <div style="font-weight: bold; font-family: 'Courier New', monospace; font-size: 14px;">
+                                                    ${bot.user_agent}
+                                                </div>
+                                                <div style="font-size: 11px; color: #666; margin-top: 3px;">
+                                                    Parsed: ${new Date(bot.created_at).toLocaleDateString()}
+                                                </div>
+                                            </div>
+                                            <button id="status-btn-${bot.bot_id}" 
+                                                    data-domain-id="${domainId}" 
+                                                    data-bot-id="${bot.bot_id}" 
+                                                    data-current-allow="${bot.allow}"
+                                                    onclick="toggleBotPermission(${domainId}, ${bot.bot_id}, ${!bot.allow})"
+                                                    style="
+                                                padding: 4px 10px;
+                                                border: none;
+                                                border-radius: 12px;
+                                                font-size: 11px;
+                                                font-weight: bold;
+                                                background: ${bot.allow ? '#28a745' : '#dc3545'};
+                                                color: white;
+                                                text-transform: uppercase;
+                                                cursor: pointer;
+                                                transition: all 0.2s ease;
+                                            " 
+                                            onmouseover="this.style.opacity='0.8'" 
+                                            onmouseout="this.style.opacity='1'"
+                                            title="Click to ${bot.allow ? 'block' : 'allow'} this bot">
+                                                ${bot.allow ? 'Allowed' : 'Blocked'}
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            // Create modal content
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    width: 90%;
+                    max-width: 700px;
+                    max-height: 85%;
+                    border-radius: 8px;
+                    display: flex;
+                    flex-direction: column;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                ">
+                    <div style="
+                        padding: 20px;
+                        border-bottom: 1px solid #ddd;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        background: #f8f9fa;
+                        border-radius: 8px 8px 0 0;
+                    ">
+                        <div>
+                            <h2 style="margin: 0; color: #333;">Data Collector Permissions</h2>
+                            <div style="color: #666; font-size: 14px; margin-top: 5px; display: flex; align-items: center;">
+                                <img src="https://${domainName}/favicon.ico" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" onerror="this.style.display='none'">
+                                ${domainName}
+                            </div>
+                        </div>
+                        <button id="close-bots-modal-btn" style="
+                            background: #dc3545;
+                            color: white;
+                            border: none;
+                            padding: 8px 10px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 16px;
+                            line-height: 1;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 32px;
+                            height: 32px;
+                        " title="Close">×</button>
+                    </div>
+                    <div style="
+                        flex: 1;
+                        padding: 20px;
+                        overflow-y: auto;
+                        background: #fff;
+                        border-radius: 0 0 8px 8px;
+                    ">
+                        ${botsContent}
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners after modal is created
+            document.body.appendChild(modal);
+            
+            // Close button click
+            const closeBtn = document.getElementById('close-bots-modal-btn');
+            closeBtn.addEventListener('click', closeModal);
+            
+            // Add hover effect for close button
+            closeBtn.addEventListener('mouseenter', () => {
+                closeBtn.style.background = '#c82333';
+            });
+            closeBtn.addEventListener('mouseleave', () => {
+                closeBtn.style.background = '#dc3545';
+            });
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Close modal with escape key
+            const escapeHandler = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    document.removeEventListener('keydown', escapeHandler);
+                }
+            };
+            document.addEventListener('keydown', escapeHandler);
+        }
+        
+        async function removeDomain(domainId, domainName) {
+            // Confirm with user
+            const confirmed = confirm(`Are you sure you want to remove "${domainName}" from your tracked domains?\n\nThis will remove your association with this domain but keep the domain data intact.`);
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/domains/${domainId}/association/${currentUser.id}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Show success message and refresh the domain list
+                    alert(`Domain "${domainName}" has been removed successfully.`);
+                    loadDomains();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+        
+        async function refreshAllRobots() {
+            const refreshAllBtn = document.getElementById('refreshAllBtn');
+            const originalText = refreshAllBtn.textContent;
+            
+            try {
+                // Get current domains list
+                const response = await fetch('/domains/' + currentUser.id);
+                const domains = await response.json();
+                
+                if (domains.length === 0) {
+                    alert('No domains to refresh.');
+                    return;
+                }
+                
+                // Disable button and show progress
+                refreshAllBtn.disabled = true;
+                refreshAllBtn.textContent = `Refreshing 0 of ${domains.length}...`;
+                
+                let completed = 0;
+                let successful = 0;
+                let errors = [];
+                
+                // Process domains concurrently with a limit
+                const processInBatches = async (items, batchSize = 3) => {
+                    for (let i = 0; i < items.length; i += batchSize) {
+                        const batch = items.slice(i, i + batchSize);
+                        const promises = batch.map(async (domain) => {
+                            try {
+                                const refreshResponse = await fetch(`/domains/${domain.id}/refresh-robots`, {
+                                    method: 'POST'
+                                });
+                                
+                                completed++;
+                                refreshAllBtn.textContent = `Refreshing ${completed} of ${domains.length}...`;
+                                
+                                if (refreshResponse.ok) {
+                                    successful++;
+                                } else {
+                                    const errorResult = await refreshResponse.json();
+                                    errors.push(`${domain.domain}: ${errorResult.error}`);
+                                }
+                            } catch (error) {
+                                completed++;
+                                errors.push(`${domain.domain}: Network error`);
+                                refreshAllBtn.textContent = `Refreshing ${completed} of ${domains.length}...`;
+                            }
+                        });
+                        
+                        await Promise.all(promises);
+                    }
+                };
+                
+                await processInBatches(domains);
+                
+                // Show results
+                let message = `Refresh complete! ${successful} of ${domains.length} domains updated successfully.`;
+                if (errors.length > 0) {
+                    message += `\n\nErrors:\n${errors.join('\n')}`;
+                }
+                alert(message);
+                
+                // Reload domains to show updated info
+                loadDomains();
+                
+            } catch (error) {
+                alert('Error refreshing domains: ' + error.message);
+            } finally {
+                // Re-enable button
+                refreshAllBtn.disabled = false;
+                refreshAllBtn.textContent = originalText;
+            }
+        }
+
+        async function toggleBotPermission(domainId, botId, newAllowValue) {
+            const statusButton = document.getElementById(`status-btn-${botId}`);
+            const botRow = document.getElementById(`bot-row-${botId}`);
+            
+            // Disable button during request
+            statusButton.disabled = true;
+            statusButton.style.opacity = '0.5';
+            statusButton.style.cursor = 'not-allowed';
+            
+            try {
+                const response = await fetch(`/domains/${domainId}/bots/${botId}/permission`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        allow: newAllowValue
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Update the UI to reflect the new permission state
+                    updateBotRowUI(botRow, statusButton, newAllowValue);
+                } else {
+                    alert('Error: ' + result.error);
+                    // Re-enable button on error
+                    statusButton.disabled = false;
+                    statusButton.style.opacity = '1';
+                    statusButton.style.cursor = 'pointer';
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+                // Re-enable button on error
+                statusButton.disabled = false;
+                statusButton.style.opacity = '1';
+                statusButton.style.cursor = 'pointer';
+            }
+        }
+        
+        function updateBotRowUI(botRow, statusButton, newAllowValue) {
+            // Update the button
+            statusButton.textContent = newAllowValue ? 'Allowed' : 'Blocked';
+            statusButton.style.background = newAllowValue ? '#28a745' : '#dc3545';
+            statusButton.title = `Click to ${newAllowValue ? 'block' : 'allow'} this bot`;
+            statusButton.onclick = function() {
+                const domainId = this.getAttribute('data-domain-id');
+                const botId = this.getAttribute('data-bot-id');
+                toggleBotPermission(domainId, botId, !newAllowValue);
+            };
+            statusButton.setAttribute('data-current-allow', newAllowValue);
+            
+            // Update the row background and borders
+            botRow.style.background = newAllowValue ? '#d4edda' : '#f8d7da';
+            botRow.style.borderColor = newAllowValue ? '#c3e6cb' : '#f5c6cb';
+            botRow.style.borderLeftColor = newAllowValue ? '#28a745' : '#dc3545';
+            
+            // Re-enable button
+            statusButton.disabled = false;
+            statusButton.style.opacity = '1';
+            statusButton.style.cursor = 'pointer';
+        }
+        
+        function toggleCompanyBots(companyId) {
+            const companyDiv = document.getElementById(companyId);
+            const toggleButton = document.getElementById(`toggle-${companyId}`);
+            
+            if (companyDiv.style.display === 'none') {
+                // Expand - show the bots
+                companyDiv.style.display = 'block';
+                companyDiv.style.animation = 'fadeIn 0.3s ease-in-out';
+                // Update button background to indicate expanded state
+                toggleButton.style.background = '#d4edda';
+                toggleButton.style.color = '#155724';
+                toggleButton.style.borderColor = '#c3e6cb';
+                toggleButton.onmouseout = function() {
+                    this.style.background = '#d4edda';
+                };
+                toggleButton.onmouseover = function() {
+                    this.style.background = '#c3e6cb';
+                };
+            } else {
+                // Collapse - hide the bots
+                companyDiv.style.display = 'none';
+                // Reset button to default state
+                toggleButton.style.background = '#e9ecef';
+                toggleButton.style.color = '#666';
+                toggleButton.style.borderColor = '';
+                toggleButton.onmouseout = function() {
+                    this.style.background = '#e9ecef';
+                };
+                toggleButton.onmouseover = function() {
+                    this.style.background = '#dee2e6';
+                };
+            }
+        }
+        
+        // Add collapse all and expand all functionality for better UX
+        function toggleAllCompanies(expand = null) {
+            const companies = document.querySelectorAll('[id^="company-"]');
+            const toggleButtons = document.querySelectorAll('[id^="toggle-company-"]');
+            
+            companies.forEach((companyDiv, index) => {
+                const isCurrentlyHidden = companyDiv.style.display === 'none';
+                const shouldExpand = expand !== null ? expand : isCurrentlyHidden;
+                
+                if (shouldExpand && isCurrentlyHidden) {
+                    // Expand
+                    toggleCompanyBots(companyDiv.id);
+                } else if (!shouldExpand && !isCurrentlyHidden) {
+                    // Collapse
+                    toggleCompanyBots(companyDiv.id);
+                }
+            });
+        }
+    </script>
+    
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</body>
+</html>

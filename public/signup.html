@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - CAFE</title>
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav">
+                <div class="logo" onclick="window.location.href='/'">
+                    <h1>CAFE</h1>
+                    <span class="tagline">Content Access Fair Exchange</span>
+                </div>
+                <div class="nav-buttons">
+                    <button onclick="window.location.href='/'" class="btn btn-secondary">
+                        ← Back to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Signup Section -->
+    <section class="auth-section">
+        <div class="container">
+            <div class="auth-card auth-card-wide">
+                <div class="auth-header">
+                    <h2>Join CAFE</h2>
+                    <p>Create your account to start managing content access</p>
+                </div>
+
+                <form id="signupForm" class="auth-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required 
+                                   placeholder="Enter your full name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required 
+                                   placeholder="Enter your email address">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required 
+                                   placeholder="Create a secure password">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="company" id="companyLabel">Company/Organization</label>
+                            <input type="text" id="company" name="company" 
+                                   placeholder="Optional">
+                            
+                            <!-- Data Collector Search (hidden by default) -->
+                            <div id="dataCollectorSearch" style="display: none;">
+                                <div class="search-container">
+                                    <input type="text" id="dataCollectorInput" placeholder="Search for your data collection company..."
+                                           autocomplete="off">
+                                    <div id="dataCollectorDropdown" class="dropdown-menu"></div>
+                                </div>
+                                <input type="hidden" id="dataCollectorId" name="data_collector_id">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Account Type</label>
+                        <div class="account-type-selection">
+                            <div class="account-option">
+                                <input type="radio" id="publisher" name="account_type" value="publisher" required>
+                                <label for="publisher" class="account-label">
+                                    <div class="account-icon">📰</div>
+                                    <div class="account-info">
+                                        <h4>Content Publisher</h4>
+                                        <p>Protect your website content and control data access</p>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="account-option">
+                                <input type="radio" id="data_collector" name="account_type" value="data_collector" required>
+                                <label for="data_collector" class="account-label">
+                                    <div class="account-icon">📊</div>
+                                    <div class="account-info">
+                                        <h4>Data Collector</h4>
+                                        <p>Access licensed content through proper agreements</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full" id="signupBtn">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-loading" style="display: none;">Creating account...</span>
+                    </button>
+                </form>
+                
+                <div id="message"></div>
+                
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="/login">Sign in here</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Data collectors cache
+        let dataCollectors = [];
+        let filteredDataCollectors = [];
+        
+        // Load data collectors on page load
+        async function loadDataCollectors() {
+            try {
+                const response = await fetch('/data-collectors');
+                if (response.ok) {
+                    dataCollectors = await response.json();
+                    filteredDataCollectors = [...dataCollectors];
+                }
+            } catch (error) {
+                console.error('Error loading data collectors:', error);
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadDataCollectors);
+        
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const signupBtn = document.getElementById('signupBtn');
+            const btnText = signupBtn.querySelector('.btn-text');
+            const btnLoading = signupBtn.querySelector('.btn-loading');
+            const messageDiv = document.getElementById('message');
+            
+            // Show loading state
+            signupBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            messageDiv.innerHTML = '';
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/create-account', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    messageDiv.innerHTML = '<div class="message success">' + result.message + ' <a href="/login">Sign in now</a></div>';
+                    e.target.reset();
+                    
+                    // Clear radio button selections
+                    document.querySelectorAll('input[name="account_type"]').forEach(input => {
+                        input.checked = false;
+                        input.parentElement.classList.remove('selected');
+                    });
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">' + result.error + '</div>';
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                messageDiv.innerHTML = '<div class="message error">Network error. Please try again.</div>';
+            } finally {
+                // Reset button state
+                signupBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+            }
+        });
+        
+        // Add visual feedback for account type selection and toggle company field
+        document.querySelectorAll('input[name="account_type"]').forEach(input => {
+            input.addEventListener('change', function() {
+                // Remove selected class from all options
+                document.querySelectorAll('.account-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // Add selected class to chosen option
+                if (this.checked) {
+                    this.parentElement.classList.add('selected');
+                }
+                
+                // Toggle company field based on account type
+                toggleCompanyField(this.value);
+            });
+        });
+        
+        // Toggle between regular company input and data collector search
+        function toggleCompanyField(accountType) {
+            const companyLabel = document.getElementById('companyLabel');
+            const companyInput = document.getElementById('company');
+            const dataCollectorSearch = document.getElementById('dataCollectorSearch');
+            
+            if (accountType === 'data_collector') {
+                companyLabel.textContent = 'Data Collection Company';
+                companyInput.style.display = 'none';
+                companyInput.required = false;
+                dataCollectorSearch.style.display = 'block';
+                document.getElementById('dataCollectorInput').required = true;
+            } else {
+                companyLabel.textContent = 'Company/Organization';
+                companyInput.style.display = 'block';
+                companyInput.required = false;
+                dataCollectorSearch.style.display = 'none';
+                document.getElementById('dataCollectorInput').required = false;
+                clearDataCollectorSelection();
+            }
+        }
+        
+        // Data collector search functionality
+        const dataCollectorInput = document.getElementById('dataCollectorInput');
+        const dataCollectorDropdown = document.getElementById('dataCollectorDropdown');
+        
+        dataCollectorInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            filteredDataCollectors = dataCollectors.filter(collector => 
+                collector.name.toLowerCase().includes(query)
+            );
+            renderDataCollectorDropdown();
+        });
+        
+        dataCollectorInput.addEventListener('focus', function() {
+            if (dataCollectors.length > 0) {
+                renderDataCollectorDropdown();
+                dataCollectorDropdown.style.display = 'block';
+            }
+        });
+        
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                dataCollectorDropdown.style.display = 'none';
+            }
+        });
+        
+        function renderDataCollectorDropdown() {
+            if (filteredDataCollectors.length === 0) {
+                dataCollectorDropdown.innerHTML = '<div class="dropdown-item">No companies found</div>';
+                dataCollectorDropdown.style.display = 'block';
+                return;
+            }
+            
+            const items = filteredDataCollectors.slice(0, 10).map(collector => 
+                `<div class="dropdown-item" data-id="${collector.id}" data-name="${collector.name}">
+                    ${collector.name}
+                </div>`
+            ).join('');
+            
+            dataCollectorDropdown.innerHTML = items;
+            dataCollectorDropdown.style.display = 'block';
+            
+            // Add click handlers
+            dataCollectorDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+                if (item.dataset.id) {
+                    item.addEventListener('click', () => selectDataCollector(item.dataset.id, item.dataset.name));
+                }
+            });
+        }
+        
+        function selectDataCollector(id, name) {
+            document.getElementById('dataCollectorInput').value = name;
+            document.getElementById('dataCollectorId').value = id;
+            dataCollectorDropdown.style.display = 'none';
+        }
+        
+        function clearDataCollectorSelection() {
+            document.getElementById('dataCollectorInput').value = '';
+            document.getElementById('dataCollectorId').value = '';
+            dataCollectorDropdown.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAFE - Publisher Dashboard</title>
+    <link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-wrapper">
+            <div class="header">
+                <h1>Publisher Dashboard</h1>
+                <div class="user-info">
+                    <div>Welcome, <span id="userName"></span></div>
+                    <div><span id="userEmail"></span></div>
+                    <button class="btn btn-danger btn-sm logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        
+            <!-- Tab Navigation -->
+            <div class="card">
+                <div class="tab-navigation">
+                    <button class="tab-button active" data-tab="domains">Domains</button>
+                    <button class="tab-button" data-tab="data-collectors">Data Collectors</button>
+                </div>
+            </div>
+
+            <!-- Domains Tab -->
+            <div class="tab-content active" id="domains-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Add Domain to Track</h2>
+                    </div>
+                    <p style="color: var(--neutral-700); margin-bottom: var(--space-lg);">
+                        Add domains that you own and want to track through CAFE.
+                    </p>
+                    
+                    <form id="domainForm">
+                        <div class="form-group">
+                            <label class="form-label" for="domains">Domain Names (one per line)</label>
+                            <textarea id="domains" name="domains" class="form-textarea" placeholder="example.com&#10;mysite.org&#10;blog.net" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Domains</button>
+                    </form>
+                    
+                    <div id="domainMessage"></div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Your Tracked Domains</h2>
+                        <div class="controls-group">
+                            <button type="button" onclick="domainManager.loadDomains()" class="btn btn-success btn-sm">
+                                Refresh Domains
+                            </button>
+                            <button type="button" onclick="domainManager.refreshAllRobots()" id="refreshAllBtn" class="btn btn-ghost btn-sm">
+                                Refresh All robots.txt
+                            </button>
+                        </div>
+                    </div>
+                    <div id="domainsList" class="data-table">
+                        <div class="table-header" style="grid-template-columns: 3fr 2fr 2fr;">
+                            <div>Domain</div>
+                            <div>robots.txt Status</div>
+                            <div>Actions</div>
+                        </div>
+                        <div class="table-body" id="domainsTableBody"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Collectors Tab -->
+            <div class="tab-content" id="data-collectors-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Data Collectors Accessing Your Domains</h2>
+                        <div class="controls-group">
+                            <button type="button" onclick="dataCollectorManager.loadDataCollectors()" class="btn btn-success btn-sm">
+                                Refresh Data
+                            </button>
+                        </div>
+                    </div>
+                    <div id="loadingDataCollectors" class="loading" style="display: none;">
+                        Loading data collectors
+                    </div>
+                    <div id="dataCollectorsList" class="data-table">
+                        <div class="table-header" style="grid-template-columns: 3fr 2fr 2fr;">
+                            <div>Data Collector</div>
+                            <div>Domain Coverage</div>
+                            <div>Actions</div>
+                        </div>
+                        <div class="table-body" id="dataCollectorsTableBody"></div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Load external scripts -->
+    <script src="js/cafe-ui.js"></script>
+    <script src="js/domain-manager.js"></script>
+    <script src="js/data-collector-manager.js"></script>
+    <script>
+        // Application State
+        let currentUser = null;
+        let domainManager = null;
+        let dataCollectorManager = null;
+        let activeTab = 'domains';
+
+        // Authentication & Initialization
+        class AuthManager {
+            static checkAuth() {
+                const userData = localStorage.getItem('user');
+                if (!userData) {
+                    window.location.href = '/';
+                    return null;
+                }
+                
+                const user = JSON.parse(userData);
+                if (user.account_type !== 'publisher') {
+                    alert('Access denied. Publishers only.');
+                    window.location.href = '/';
+                    return null;
+                }
+                
+                return user;
+            }
+            
+            static logout() {
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+            
+            static displayUserInfo(user) {
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userEmail').textContent = user.email;
+            }
+        }
+
+        // Application Initialization
+        window.onload = function() {
+            currentUser = AuthManager.checkAuth();
+            if (!currentUser) return;
+            
+            AuthManager.displayUserInfo(currentUser);
+            domainManager = new DomainManager(currentUser);
+            dataCollectorManager = new DataCollectorManager(currentUser);
+            domainManager.loadDomains();
+            
+            setupEventListeners();
+            setupTabSystem();
+        };
+
+        function setupEventListeners() {
+            // Domain form submission
+            document.getElementById('domainForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = CafeUtils.getFormData(e.target);
+                await domainManager.addDomains(formData.domains);
+            });
+        }
+
+        // Global functions for backward compatibility
+        function logout() {
+            AuthManager.logout();
+        }
+
+        // Tab System Management
+        function setupTabSystem() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            if (activeTab === tabName) return;
+
+            // Update button states
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Update content visibility
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+
+            activeTab = tabName;
+
+            // Load data for the active tab
+            if (tabName === 'data-collectors' && dataCollectorManager) {
+                dataCollectorManager.loadDataCollectors();
+            }
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .fade-in {
+                animation: fadeIn 0.3s ease-in-out;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
